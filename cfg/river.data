@@ -1,0 +1,5 @@
+classes = 10
+train = data/river/train.txt
+test = data/river/test.txt
+names = cfg/river.names
+backup = backup/river/
