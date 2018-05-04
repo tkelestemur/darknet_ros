@@ -51,7 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   DIRECTORY
-  detection_msgs
+  msg
   FILES
   Detection.msg
 )
@@ -59,7 +59,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   DIRECTORY
-  detection_srvs
+  srv
   FILES
   GetDetections.srv
 )
