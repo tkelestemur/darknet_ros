@@ -1,2 +1,3 @@
 weights/*.backup
 weights/*.weights
+scripts/*.pyc

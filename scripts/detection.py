@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import rospkg
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image, CameraInfo
 from darknet_ros.msg import Detection
@@ -13,12 +14,12 @@ import numpy as np
 import darknet_cv2 as darknet
 
 # File Organization
-pkg_dir = "/home/nyokoyama/ros_ws/src/darknet_ros"
-cfg_dir = pkg_dir+"/cfg/"
-weights_dir = pkg_dir+"/weights/"
+# pkg_dir = "/home/nyokoyama/ros_ws/src/darknet_ros"
+# cfg_dir = pkg_dir+"/cfg/"
+# weights_dir = pkg_dir+"/weights/"
 # Load models
-groceries_network = darknet.load_net(cfg_dir+"river2.cfg", weights_dir+"river2.backup", 0)
-groceries_meta = darknet.load_meta(cfg_dir+"river.data")
+# groceries_network = darknet.load_net(cfg_dir+"river2.cfg", weights_dir+"river2.backup", 0)
+# groceries_meta = darknet.load_meta(cfg_dir+"river.data")
 # yolov2_network = darknet.load_net(cfg_dir+"yolov2.cfg", weights_dir+"yolov2.weights", 0)
 # yolov2_meta = darknet.load_meta(cfg_dir+"coco.data")
 
@@ -37,6 +38,13 @@ class DarknetROS():
 
         self.cv_bridge = CvBridge()
 
+        rospack = rospkg.RosPack()
+        pkg_dir = rospack.get_path('darknet_ros')
+        cfg_dir = pkg_dir + "/cfg/"
+        weights_dir = pkg_dir + "/weights/"
+
+        self.groceries_network = darknet.load_net(cfg_dir+"river2.cfg", weights_dir+"river2.backup", 0)
+        self.groceries_meta = darknet.load_meta(cfg_dir+"river.data")
         rospy.sleep(1) # settle down
 
     def rgb_cb(self, msg):
@@ -51,7 +59,7 @@ class DarknetROS():
     def detection_service(self, req):
         img = self.frame
         # results = darknet.detect(yolov2_network, yolov2_meta, img, thresh=0.35)
-        results = darknet.detect(groceries_network, groceries_meta, img, thresh=0.35)
+        results = darknet.detect(self.groceries_network, self.groceries_meta, img, thresh=0.35)
         print results
         detections = []
         for box in results:
@@ -106,7 +114,7 @@ class DarknetROS():
         # rospy.set_param("/hsrb/stereo_camera/property/shutter/on_off",True)
         # rospy.set_param("/hsrb/stereo_camera/property/shutter/auto_manual_mode",True)
         # rospy.set_param("/hsrb/stereo_camera/property/shutter/one_push",False)
-        
+
         # rospy.set_param("/hsrb/stereo_camera/property/white_balance/on_off",True)
         # rospy.set_param("/hsrb/stereo_camera/property/white_balance/auto_manual_mode",True)
         # rospy.set_param("/hsrb/stereo_camera/property/white_balance/one_push",False)
