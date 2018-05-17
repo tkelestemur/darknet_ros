@@ -38,7 +38,7 @@ class METADATA(Structure):
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
 dir_path2 = os.path.dirname(dir_path)
-lib = CDLL(dir_path2+"/libdarknet.so", RTLD_GLOBAL)
+lib = CDLL(dir_path2+"/libdarknet.so.gpu", RTLD_GLOBAL)
 
 set_gpu = lib.cuda_set_device
 set_gpu.argtypes = [c_int]
@@ -97,4 +97,3 @@ def detect(net, meta, imgcv2, thresh=.5, hier_thresh=.5, nms=.45):
     free_image(im)
     free_detections(dets, num)
     return res
-

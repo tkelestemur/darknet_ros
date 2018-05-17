@@ -1,4 +1,5 @@
 Header header
 string label
-float32[4] bbox
+int32[4] bbox
+int32[2] center
 float32 accuracy
