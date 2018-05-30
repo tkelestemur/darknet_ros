@@ -1,0 +1,4 @@
+classes= 19
+train  = data/river2/train.txt
+names = /home/tarik/frasier_ws/src/darknet_ros/cfg/groceries_v2/river2.names
+backup = backup/river2/

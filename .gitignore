@@ -1,3 +1,6 @@
-weights/*.backup
-weights/*.weights
+weights/groceries_v2/*.backup
+weights/groceries_v2/*.weights
 scripts/*.pyc
+cmake-build-debug/
+cmake-build-release/
+.idea/

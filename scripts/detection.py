@@ -21,17 +21,19 @@ class DarknetROS():
         rospy.init_node('darknet_ros')
         rospack = rospkg.RosPack()
         pkg_dir = rospack.get_path('darknet_ros')
-        cfg_dir = pkg_dir + "/cfg/"
-        weights_dir = pkg_dir + "/weights/"
+        cfg_dir = pkg_dir + "/cfg/groceries_v2/"
+        weights_dir = pkg_dir + "/weights/groceries_v2/"
+        # weights_name = "river2_13hrs.backup"
+        weights_name = "river_less_noise_100000_unfrozen_49hrs.backup"
 
-        self.groceries_network = darknet.load_net(cfg_dir+"river2.cfg", weights_dir+"river2.backup", 0)
-        self.groceries_meta = darknet.load_meta(cfg_dir+"river.data")
+        self.groceries_network = darknet.load_net(cfg_dir + "river2.cfg", weights_dir + weights_name, 0)
+        self.groceries_meta = darknet.load_meta(cfg_dir + "river2.data")
 
         rgb_topic = "/hsrb/head_rgbd_sensor/rgb/image_rect_color"
         camera_info_topic = "/hsrb/head_rgbd_sensor/depth_registered/camera_info"
         detection_image_topic = "/darknet_ros/detection_image"
-        # rgb_topic = "/hsrb/head_rgbd_sensor/rgb/image_raw"
-        # rgb_topic = "/hsrb/head_r_stereo_camera/image_raw"
+
+
         self.rgb_sub = rospy.Subscriber(rgb_topic, Image, self.rgb_cb)
         self.rgb_info_sub = rospy.Subscriber(camera_info_topic, CameraInfo, self.rgb_info_cb)
         self.detection_image_pub = rospy.Publisher(detection_image_topic, Image, queue_size=10)
@@ -62,13 +64,7 @@ class DarknetROS():
     def detection_service(self, req):
 
         img = self.frame
-        # try:
-        #     img = self.cv_bridge.imgmsg_to_cv2(req.image, "bgr8")
-        #
-        # except CvBridgeError, e:
-        #     a=e
 
-        # results = darknet.detect(yolov2_network, yolov2_meta, img, thresh=0.35)
         results = darknet.detect(self.groceries_network, self.groceries_meta, img, thresh=0.40)
         self._draw_bbox(img, results)
         detections = []
@@ -87,8 +83,15 @@ class DarknetROS():
                 top = cy - (h/2)
             else:
                 top = 0
-            right = left + w
-            bottom = top + h
+            if left+w < np.size(img, 1):
+                right = left + w
+            else:
+                right = np.size(img, 1)
+            if top+h < np.size(img, 0):
+                bottom = top + h
+            else:
+                bottom = np.size(img, 0)
+
             detection = Detection()
             detection.header.stamp = rospy.Time.now()
             detection.label = label
