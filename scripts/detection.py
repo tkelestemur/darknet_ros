@@ -37,8 +37,8 @@ class DarknetROS():
         self.rgb_sub = rospy.Subscriber(rgb_topic, Image, self.rgb_cb)
         self.rgb_info_sub = rospy.Subscriber(camera_info_topic, CameraInfo, self.rgb_info_cb)
         self.detection_image_pub = rospy.Publisher(detection_image_topic, Image, queue_size=10)
-        self.detection_srv = rospy.Service('/darknet_ros/detect', GetDetections, self.detection_service)
-        self.detection_srv = rospy.Service('/darknet_ros/start_detection', Empty, self.continuous_detection_service)
+        self.detection_srv = rospy.Service('/frasier/darknet_ros/detect', GetDetections, self.detection_service)
+        # self.detection_srv = rospy.Service('/darknet_ros/start_detection', Empty, self.continuous_detection_service)
 
         self.cam_model = PinholeCameraModel()
         self.cv_bridge = CvBridge()
