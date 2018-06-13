@@ -27,18 +27,17 @@ class DarknetROS():
         weights_name = "river_less_noise_100000_unfrozen_49hrs.backup"
 
         self.groceries_network = darknet.load_net(cfg_dir + "river2.cfg", weights_dir + weights_name, 0)
-        self.groceries_meta = darknet.load_meta(cfg_dir + "river2.data")
+        data_file = darknet.generate_data_file(cfg_dir,"river2.cfg","river2.names")
+        self.groceries_meta = darknet.load_meta(data_file)
 
         rgb_topic = "/hsrb/head_rgbd_sensor/rgb/image_rect_color"
         camera_info_topic = "/hsrb/head_rgbd_sensor/depth_registered/camera_info"
         detection_image_topic = "/darknet_ros/detection_image"
 
-
         self.rgb_sub = rospy.Subscriber(rgb_topic, Image, self.rgb_cb)
         self.rgb_info_sub = rospy.Subscriber(camera_info_topic, CameraInfo, self.rgb_info_cb)
         self.detection_image_pub = rospy.Publisher(detection_image_topic, Image, queue_size=10)
         self.detection_srv = rospy.Service('/frasier/darknet_ros/detect', GetDetections, self.detection_service)
-        # self.detection_srv = rospy.Service('/darknet_ros/start_detection', Empty, self.continuous_detection_service)
 
         self.cam_model = PinholeCameraModel()
         self.cv_bridge = CvBridge()

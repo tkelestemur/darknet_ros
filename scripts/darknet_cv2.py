@@ -4,13 +4,6 @@ import random
 import cv2
 import numpy as np
 
-def flatten_cv2(img):
-    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-    flatimg = cv2.transpose(img).flatten('F')
-    flatimg = flatimg.astype('float')/255.
-    arr = (c_float * len(flatimg))(*flatimg)
-    return cast(arr, POINTER(c_float))
-
 class BOX(Structure):
     _fields_ = [("x", c_float),
                 ("y", c_float),
@@ -75,6 +68,13 @@ predict_image = lib.network_predict_image
 predict_image.argtypes = [c_void_p, IMAGE]
 predict_image.restype = POINTER(c_float)
 
+def flatten_cv2(img):
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    flatimg = cv2.transpose(img).flatten('F')
+    flatimg = flatimg.astype('float')/255.
+    arr = (c_float * len(flatimg))(*flatimg)
+    return cast(arr, POINTER(c_float))
+
 def detect(net, meta, imgcv2, thresh=.5, hier_thresh=.5, nms=.45):
     im = make_image(c_int(imgcv2.shape[1]),
                     c_int(imgcv2.shape[0]),
@@ -97,3 +97,12 @@ def detect(net, meta, imgcv2, thresh=.5, hier_thresh=.5, nms=.45):
     free_image(im)
     free_detections(dets, num)
     return res
+
+def generate_data_file(cfg_path,cfg_filename,names_filename):
+    data_filename = cfg_path+cfg_filename.split('.')[0]+'.data'
+    data_file = open(data_filename,'w')
+    names_file = open(cfg_path+names_filename)
+    num_classes = str(len(names_file.readlines()))
+    data_file.write('classes='+num_classes+'\n')
+    data_file.write('names='+cfg_path+names_filename+'\n')
+    return data_filename
