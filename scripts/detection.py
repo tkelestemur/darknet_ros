@@ -21,13 +21,13 @@ class DarknetROS():
         rospy.init_node('darknet_ros')
         rospack = rospkg.RosPack()
         pkg_dir = rospack.get_path('darknet_ros')
-        cfg_dir = pkg_dir + "/cfg/groceries_v2/"
-        weights_dir = pkg_dir + "/weights/groceries_v2/"
+        cfg_dir = pkg_dir + "/cfg/robocup/"
+        weights_dir = pkg_dir + "/weights/robocup/"
         # weights_name = "river2_13hrs.backup"
-        weights_name = "river_less_noise_100000_unfrozen_49hrs.backup"
+        weights_name = "robocup8.backup"
 
-        self.groceries_network = darknet.load_net(cfg_dir + "river2.cfg", weights_dir + weights_name, 0)
-        data_file = darknet.generate_data_file(cfg_dir,"river2.cfg","river2.names")
+        self.groceries_network = darknet.load_net(cfg_dir + "robocup8.cfg", weights_dir + weights_name, 0)
+        data_file = darknet.generate_data_file(cfg_dir,"robocup8.cfg","robocup8.names")
         self.groceries_meta = darknet.load_meta(data_file)
 
         rgb_topic = "/hsrb/head_rgbd_sensor/rgb/image_rect_color"
@@ -61,7 +61,6 @@ class DarknetROS():
             a=e
 
     def detection_service(self, req):
-
         img = self.frame
 
         results = darknet.detect(self.groceries_network, self.groceries_meta, img, thresh=0.40)
@@ -98,9 +97,8 @@ class DarknetROS():
             detection.center = [cx, cy]
             detection.accuracy = box[1]
             msg = self.cv_bridge.cv2_to_imgmsg(img)
-            self.detection_image_pub.publish(msg)
+            # self.detection_image_pub.publish(msg)
             detections.append(detection)
-
 
         return GetDetectionsResponse(detections)
 
